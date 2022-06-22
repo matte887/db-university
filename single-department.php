@@ -6,12 +6,20 @@ require_once __DIR__ . "/database-connection.php";
 require_once __DIR__ . "/Department.php";
 
 // 15 - Facciamo la query per richiedere le informazioni del dipartimento. Per questo serve GET.
-$id = $_GET["id"];
-$sql = "SELECT * FROM `departments` WHERE `id`=$id;";
+// $id = $_GET["id"];
+// $sql = "SELECT * FROM `departments` WHERE `id`=$id;";
 // 16 - Poi estraiamo il risultato
-$result = $conn->query($sql);
+// $result = $conn->query($sql);
+// 28 - Passando l'id in questo modo, rende il sistema suscettibile a sql injections, per questo, lo sostituiamo con:
+$stmt = $conn->prepare("SELECT * FROM `departments` WHERE `id`=?");
+$stmt->bind_param("d", $id); // In questo modo questa funzione passerà solo un numero, se venisse passato manualmente altro, verrebbe troncato...
+$id = $_GET["id"];
+$stmt->execute();
+$result = $stmt->get_result();
+
 // 17 - Adesso aggiungendo manualmente all'URL "?id=1", col var_dump visualizzeremo il risultato, composto da una sola riga (num_rows = 1) perché abbiamo specificato l'id che ci interessava con WHERE.
 // var_dump($result);
+
 
 // 18 - Nostante sia solo un risultato si predispone un array per raccogliere i risultati.
 $departments = [];
